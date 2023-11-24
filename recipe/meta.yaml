@@ -1,5 +1,5 @@
 {% set name = "deepspeed" %}
-{% set version = "0.10.0" %}
+{% set version = "0.11.1" %}
 
 package:
   name: {{ name }}
@@ -12,7 +12,7 @@ source:
 build:
   number: 1
   string: cuda{{ cudatoolkit | replace(".*", "") }}_py{{ python | replace(".", "") }}_{{ PKG_BUILDNUM }}
-  script: DS_BUILD_SPARSE_ATTN=0; DS_BUILD_OPS=1; {{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv
+  script: DS_BUILD_OPS=1; DS_BUILD_FUSED_LAMB=0; DS_BUILD_EVOFORMER_ATTN=0; DS_BUILD_CUTLASS_OPS=0; DS_BUILD_RAGGED_DEVICE_OPS=0; DS_BUILD_AIO=0; {{ PYTHON }} -m pip install deepspeed=={{ version }} --no-deps --ignore-installed --no-cache-dir -vvv
   script_env:
     - CUDA_HOME
   
@@ -25,11 +25,12 @@ requirements:
     - pip
     - pytorch           {{ pytorch }}
     - python            {{ python }}
+    - libaio  # [linux]
   run:
     - hjson-py
     - ninja             {{ ninja }}
     - numpy             {{ numpy }}
-    - packaging
+    - packaging>=20.0
     - psutil            {{ psutil }}
     - python            {{ python }}
     - py-cpuinfo
